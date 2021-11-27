@@ -4,20 +4,17 @@ image:
   repository: postgres
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "14.1-alpine"
+  tag: "14.1"
 
 nameOverride: ""
 fullnameOverride: ""
+port: 5432
 
 rootAccount: { }
-
 # needs to be in format db:user,db2:user2
 additionalDatabases: "db1:user1"
 
-service:
-  type: ClusterIP
-  port: 5432
-
-
 podAnnotations: { }
 resources: { }
+test:
+  waitInSec: 5

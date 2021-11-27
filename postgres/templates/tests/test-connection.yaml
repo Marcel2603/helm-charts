@@ -1,15 +1,31 @@
-{{/*apiVersion: v1*/}}
-{{/*kind: Pod*/}}
-{{/*metadata:*/}}
-{{/*  name: "{{ include "postgres.fullname" . }}-test-connection"*/}}
-{{/*  labels:*/}}
-{{/*    {{- include "postgres.labels" . | nindent 4 }}*/}}
-{{/*  annotations:*/}}
-{{/*    "helm.sh/hook": test*/}}
-{{/*spec:*/}}
-{{/*  containers:*/}}
-{{/*    - name: wget*/}}
-{{/*      image: busybox*/}}
-{{/*      command: ['wget']*/}}
-{{/*      args: ['{{ include "postgres.fullname" . }}:{{ .Values.service.port }}']*/}}
-{{/*  restartPolicy: Never*/}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "postgres.fullname" . }}-test-connection"
+  labels:
+  {{- include "postgres.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test,post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  containers:
+    - name: postgres-test
+      image: "governmentpaas/psql:168a6c8b43fdec99607fd8bc01c5986a46a72dc0"
+      env:
+        - name: PGHOST
+          value: {{ template "postgres.fullname" . }}
+        - name: PGPORT
+          value: "{{ include "postgres.port" . }}"
+        - name: PGUSER
+          value: {{ .Values.rootAccount.user | default "postgres" }}
+        - name: PGPASSWORD
+          value: {{ .Values.rootAccount.password | default "postgres" }}
+        - name: WAIT_BEFORE_START
+          value: "{{ .Values.test.waitInSec }}"
+      command:
+        - /bin/sh
+        - -ec
+        - sleep $WAIT_BEFORE_START
+        - |
+          psql
+  restartPolicy: Never

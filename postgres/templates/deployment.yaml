@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 5432
+              containerPort: {{ include "postgres.port" . }}
               protocol: TCP
           resources:
           {{- toYaml .Values.resources | nindent 12 }}

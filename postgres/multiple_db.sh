@@ -2,24 +2,6 @@
 set -e
 set -u
 
-function create_user_and_database() {
-  local database=$(echo $1 | tr ':' ' ' | awk '{print $1}')
-  local owner=$(echo $1 | tr ':' ' ' | awk '{print $2}')
-  echo "Creating user and database '$database'"
-  psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-  DO
-  $body$
-  BEGIN
-      CREATE USER $owner;
-      CREATE DATABASE $database;
-  EXCEPTION WHEN duplicate_object THEN
-      RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
-  END
-  $body$;
-  GRANT ALL PRIVILEGES ON DATABASE $database TO $owner;
-EOSQL
-}
-
 function create_user() {
   local user
   user=$1
@@ -52,7 +34,7 @@ function grant_privileges() {
   user=$2
   psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
       GRANT ALL PRIVILEGES ON DATABASE $database TO $POSTGRES_USER;
-      GRANT ALL PRIVILEGES ON DATABASE $database TO $owner;
+      GRANT ALL PRIVILEGES ON DATABASE $database TO $user;
 EOSQL
 }
 if [ -n "$POSTGRES_ADDITIONAL_DATABASES" ]; then
@@ -62,7 +44,7 @@ if [ -n "$POSTGRES_ADDITIONAL_DATABASES" ]; then
     owner=$(echo $db | tr ':' ' ' | awk '{print $2}')
     create_user $owner
     create_database $database
-    grand_priviliges $database $owner
+    grant_privileges $database $owner
   done
   echo "Multiple databases created"
 fi
