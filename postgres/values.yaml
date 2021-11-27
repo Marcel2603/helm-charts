@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "14.1-alpine"
+
+nameOverride: ""
+fullnameOverride: ""
+
+rootAccount: { }
+
+# needs to be in format db:user,db2:user2
+additionalDatabases: "db1:user1"
+
+service:
+  type: ClusterIP
+  port: 5432
+
+
+podAnnotations: { }
+resources: { }

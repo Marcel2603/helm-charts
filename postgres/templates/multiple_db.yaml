@@ -1,0 +1,9 @@
+{{- if .Values.additionalDatabases }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "postgres.fullname" . }}-multiple-db-config
+data:
+  multiple_db.sh: |-
+{{ (.Files.Get "multiple_db.sh") | indent 4}}
+{{- end }}

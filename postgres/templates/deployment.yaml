@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "postgres.fullname" . }}
+  labels:
+  {{- include "postgres.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+  {{- include "postgres.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+    {{- include "postgres.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5432
+              protocol: TCP
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.rootAccount.password | default "postgres"}}
+            - name: POSTGRES_USER
+              value: {{ .Values.rootAccount.user | default "postgres" }}
+            {{- with .Values.additionalDatabases }}
+            - name: POSTGRES_ADDITIONAL_DATABASES
+              value: {{ . }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.additionalDatabases }}
+            - name: {{ template "postgres.fullname" . }}-multiple-db-config
+              mountPath: /docker-entrypoint-initdb.d
+          {{- end }}
+      volumes:
+        {{- if .Values.additionalDatabases }}
+        - name: {{ template "postgres.fullname" . }}-multiple-db-config
+          configMap:
+            name: {{ template "postgres.fullname" . }}-multiple-db-config
+  {{- end }}
