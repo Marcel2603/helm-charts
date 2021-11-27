@@ -45,7 +45,7 @@ function create_database() {
 EOSQL
 }
 
-function grand_priviliges() {
+function grant_privileges() {
   local database
   local user
   database=$1
