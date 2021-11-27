@@ -49,3 +49,7 @@ Selector labels
 app.kubernetes.io/name: {{ include "postgres.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{- define "postgres.port" -}}
+{{ .Values.port | default 5432}}
+{{- end }}
