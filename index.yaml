@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  postgres:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2021-11-28T09:30:46.964032205+01:00"
+    description: A simple postgres database for Kubernetes
+    digest: dd71f12981b42d21e9bd92ff668f064b500ef447edadc72913cb14b247aa271e
+    icon: https://www.vectorlogo.zone/logos/postgresql/postgresql-vertical.svg
+    name: postgres
+    type: application
+    urls:
+    - https://Marcel2603.github.io/helm-charts/postgres-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-11-28T09:30:46.963643548+01:00"
